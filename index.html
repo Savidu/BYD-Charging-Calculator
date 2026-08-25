@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BYD Atto 3 (50 kWh) Charging Cost Calculator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #0ea5e9;
+      --accent-hover: #0284c7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .calculator-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      /* Extra right padding so text never overlaps spinner arrows or unit badge */
+      padding: 12px 64px 12px 14px;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    /* Hide default browser number spinners to prevent overlap */
+    input[type="number"]::-webkit-inner-spin-button, 
+    input[type="number"]::-webkit-outer-spin-button { 
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+    }
+
+    .unit-badge {
+      position: absolute;
+      right: 14px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      pointer-events: none;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .preset-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .results {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .result-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .result-value.highlight {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator-card">
+    <div class="header">
+      <h1>BYD Atto 3 Calculator</h1>
+      <p>50 kWh Battery Version (49.9 kWh Usable)</p>
+    </div>
+
+    <!-- State of Charge Inputs -->
+    <div class="grid-2 form-group">
+      <div>
+        <label for="startSoc">Start Level</label>
+        <div class="input-wrapper">
+          <input type="number" id="startSoc" value="20" min="0" max="100">
+          <span class="unit-badge">%</span>
+        </div>
+      </div>
+      <div>
+        <label for="endSoc">Target Level</label>
+        <div class="input-wrapper">
+          <input type="number" id="endSoc" value="80" min="0" max="100">
+          <span class="unit-badge">%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unit Cost (LKR) -->
+    <div class="form-group">
+      <label for="unitCost">Unit Cost</label>
+      <div class="input-wrapper">
+        <input type="number" id="unitCost" value="18.00" step="0.50" min="0">
+        <span class="unit-badge">LKR / kWh</span>
+      </div>
+    </div>
+
+    <!-- Charging Speed -->
+    <div class="form-group">
+      <label for="chargeSpeed">Charging Speed</label>
+      <div class="input-wrapper">
+        <input type="number" id="chargeSpeed" value="7.0" step="0.1" min="0.1">
+        <span class="unit-badge">kW</span>
+      </div>
+      <div class="presets">
+        <button class="preset-btn" onclick="setSpeed(2.3)">2.3 kW (3-pin)</button>
+        <button class="preset-btn" onclick="setSpeed(7.0)">7.0 kW (AC Wallbox)</button>
+        <button class="preset-btn" onclick="setSpeed(70.0)">70.0 kW (DC Fast)</button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results">
+      <div class="result-row">
+        <span class="result-label">Energy Added</span>
+        <span class="result-value" id="energyAdded">0.00 kWh</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Est. Charging Time</span>
+        <span class="result-value" id="chargeTime">0h 0m</span>
+      </div>
+      <div class="result-row" style="margin-top: 12px;">
+        <span class="result-label" style="font-weight: 600; color: var(--text);">Total Cost</span>
+        <span class="result-value highlight" id="totalCost">LKR 0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BATTERY_CAPACITY_KWH = 49.9; // Standard Range usable capacity
+    const CHARGING_EFFICIENCY = 0.90;  // Fixed 90% charging efficiency
+
+    const startSocInput = document.getElementById('startSoc');
+    const endSocInput = document.getElementById('endSoc');
+    const unitCostInput = document.getElementById('unitCost');
+    const chargeSpeedInput = document.getElementById('chargeSpeed');
+
+    const energyAddedEl = document.getElementById('energyAdded');
+    const chargeTimeEl = document.getElementById('chargeTime');
+    const totalCostEl = document.getElementById('totalCost');
+
+    function setSpeed(speed) {
+      chargeSpeedInput.value = speed;
+      calculate();
+    }
+
+    function calculate() {
+      let startSoc = parseFloat(startSocInput.value) || 0;
+      let endSoc = parseFloat(endSocInput.value) || 0;
+      let unitCost = parseFloat(unitCostInput.value) || 0;
+      let speed = parseFloat(chargeSpeedInput.value) || 0.1;
+
+      // Validation logic
+      if (startSoc < 0) startSoc = 0;
+      if (endSoc > 100) endSoc = 100;
+      if (endSoc < startSoc) endSoc = startSoc;
+
+      const socDiffPercent = (endSoc - startSoc) / 100;
+      
+      // Net energy stored in the battery
+      const netEnergyKwh = BATTERY_CAPACITY_KWH * socDiffPercent;
+
+      // Total energy drawn from grid (factoring in 90% efficiency)
+      const grossEnergyKwh = netEnergyKwh / CHARGING_EFFICIENCY;
+      
+      // Cost calculation in LKR based on grid draw
+      const totalCost = grossEnergyKwh * unitCost;
+
+      // Time calculation (Hours = Grid Energy / kW speed)
+      const totalHours = grossEnergyKwh / speed;
+      const hours = Math.floor(totalHours);
+      const minutes = Math.round((totalHours - hours) * 60);
+
+      // DOM Updates
+      energyAddedEl.textContent = `${netEnergyKwh.toFixed(2)} kWh`;
+      totalCostEl.textContent = `LKR ${totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      
+      if (speed <= 0 || isNaN(totalHours)) {
+        chargeTimeEl.textContent = '--';
+      } else {
+        chargeTimeEl.textContent = `${hours}h ${minutes}m`;
+      }
+    }
+
+    // Attach real-time event listeners
+    [startSocInput, endSocInput, unitCostInput, chargeSpeedInput].forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+
+    // Initial calculation on load
+    calculate();
+  </script>
+</body>
+</html>
