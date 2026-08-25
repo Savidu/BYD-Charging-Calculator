@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BYD Atto 3 (50 kWh) Charging Cost Calculator</title>
+  
+  <!-- Browser & Bookmark Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+
   <style>
     :root {
       --bg: #0f172a;
@@ -78,7 +83,6 @@
 
     input[type="number"] {
       width: 100%;
-      /* Extra right padding so text never overlaps spinner arrows or unit badge */
       padding: 12px 64px 12px 14px;
       background-color: var(--bg);
       border: 1px solid var(--border);
@@ -89,7 +93,6 @@
       transition: border-color 0.2s;
     }
 
-    /* Hide default browser number spinners to prevent overlap */
     input[type="number"]::-webkit-inner-spin-button, 
     input[type="number"]::-webkit-outer-spin-button { 
       -webkit-appearance: none;
@@ -181,7 +184,6 @@
       <p>50 kWh Battery Version (49.9 kWh Usable)</p>
     </div>
 
-    <!-- State of Charge Inputs -->
     <div class="grid-2 form-group">
       <div>
         <label for="startSoc">Start Level</label>
@@ -199,7 +201,6 @@
       </div>
     </div>
 
-    <!-- Unit Cost (LKR) -->
     <div class="form-group">
       <label for="unitCost">Unit Cost</label>
       <div class="input-wrapper">
@@ -208,7 +209,6 @@
       </div>
     </div>
 
-    <!-- Charging Speed -->
     <div class="form-group">
       <label for="chargeSpeed">Charging Speed</label>
       <div class="input-wrapper">
@@ -222,7 +222,6 @@
       </div>
     </div>
 
-    <!-- Results Section -->
     <div class="results">
       <div class="result-row">
         <span class="result-label">Energy Added</span>
@@ -240,8 +239,8 @@
   </div>
 
   <script>
-    const BATTERY_CAPACITY_KWH = 49.9; // Standard Range usable capacity
-    const CHARGING_EFFICIENCY = 0.90;  // Fixed 90% charging efficiency
+    const BATTERY_CAPACITY_KWH = 49.9;
+    const CHARGING_EFFICIENCY = 0.90;
 
     const startSocInput = document.getElementById('startSoc');
     const endSocInput = document.getElementById('endSoc');
@@ -263,28 +262,19 @@
       let unitCost = parseFloat(unitCostInput.value) || 0;
       let speed = parseFloat(chargeSpeedInput.value) || 0.1;
 
-      // Validation logic
       if (startSoc < 0) startSoc = 0;
       if (endSoc > 100) endSoc = 100;
       if (endSoc < startSoc) endSoc = startSoc;
 
       const socDiffPercent = (endSoc - startSoc) / 100;
-      
-      // Net energy stored in the battery
       const netEnergyKwh = BATTERY_CAPACITY_KWH * socDiffPercent;
-
-      // Total energy drawn from grid (factoring in 90% efficiency)
       const grossEnergyKwh = netEnergyKwh / CHARGING_EFFICIENCY;
-      
-      // Cost calculation in LKR based on grid draw
       const totalCost = grossEnergyKwh * unitCost;
 
-      // Time calculation (Hours = Grid Energy / kW speed)
       const totalHours = grossEnergyKwh / speed;
       const hours = Math.floor(totalHours);
       const minutes = Math.round((totalHours - hours) * 60);
 
-      // DOM Updates
       energyAddedEl.textContent = `${netEnergyKwh.toFixed(2)} kWh`;
       totalCostEl.textContent = `LKR ${totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       
@@ -295,12 +285,10 @@
       }
     }
 
-    // Attach real-time event listeners
     [startSocInput, endSocInput, unitCostInput, chargeSpeedInput].forEach(input => {
       input.addEventListener('input', calculate);
     });
 
-    // Initial calculation on load
     calculate();
   </script>
 </body>
